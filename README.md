@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
   class User {
     + ID
@@ -33,3 +34,5 @@ classDiagram
   User --|> Task
   User --|> Notification
   Task --|> User
+
+```
