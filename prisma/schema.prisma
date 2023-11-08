@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  tasks     Task[]
+  notifications Notification[]
+}
+
+model Task {
+  id        Int        @id @default(autoincrement())
+  title     String
+  description String?
+  dueDate   DateTime?
+  priority  String
+  status    String
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        Int        @id @default(autoincrement())
+  message   String
+  dateTime  DateTime
+  recipientId Int
+  recipient User       @relation(fields: [recipientId], references: [id])
+}
