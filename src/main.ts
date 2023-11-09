@@ -14,6 +14,11 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(
+    `Application is running on: ${(await app.getUrl()).replace(
+      '[::1]',
+      'localhost',
+    )}`,
+  );
 }
 bootstrap();
