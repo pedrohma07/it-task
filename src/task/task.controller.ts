@@ -6,6 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -16,12 +19,14 @@ import { AuthService } from 'src/auth/auth.service';
 export class TaskController {
   constructor(
     private readonly taskService: TaskService,
-    private readonly jwtService: AuthService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post()
-  async addTask(@Body('token') token: string, createTaskDto: CreateTaskDto) {
-    const decodedToken = await this.jwtService.validateToken(token);
+  async addTask(@Req() request: Request, @Body() createTaskDto: CreateTaskDto) {
+    const token = request.headers['authorization'].split(' ')[1];
+    const decodedToken = await this.authService.validateToken(token);
+
     return this.taskService.create(createTaskDto, decodedToken.sub);
   }
 
@@ -35,11 +40,13 @@ export class TaskController {
     return this.taskService.findOne(+id);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
   editTask(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(+id, updateTaskDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   deleteTask(@Param('id') id: string) {
     return this.taskService.remove(+id);
