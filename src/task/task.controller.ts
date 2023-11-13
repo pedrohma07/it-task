@@ -10,14 +10,19 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly jwtService: AuthService,
+  ) {}
 
   @Post()
-  addTask(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto, 6);
+  async addTask(@Body('token') token: string, createTaskDto: CreateTaskDto) {
+    const decodedToken = await this.jwtService.validateToken(token);
+    return this.taskService.create(createTaskDto, decodedToken.sub);
   }
 
   @Get()

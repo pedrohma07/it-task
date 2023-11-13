@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
@@ -42,5 +42,14 @@ export class AuthService {
       }
     }
     throw new Error('Email address or password provided is incorrect.');
+  }
+
+  async validateToken(token: string) {
+    try {
+      const decoded = await this.jwtService.verify(token);
+      return decoded;
+    } catch (error) {
+      throw new UnauthorizedException('Token inválido');
+    }
   }
 }

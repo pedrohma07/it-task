@@ -24,4 +24,14 @@ export class AuthController {
 
     return this.authService.login(req.user);
   }
+
+  @Post('verify-token')
+  @UseGuards(LocalAuthGuard) // Use o AuthGuard para proteger a rota
+  async verifyToken(@Req() request: Request) {
+    const token = request.headers.authorization.split(' ')[1]; // Pega o token do cabeçalho
+
+    const decodedToken = await this.jwtService.validateToken(token);
+    console.log(decodedToken.sub); // Aqui você tem o ID do usuário
+    return decodedToken;
+  }
 }
