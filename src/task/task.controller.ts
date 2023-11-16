@@ -13,7 +13,7 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { AuthService } from '../../src/auth/auth.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('task')
 export class TaskController {

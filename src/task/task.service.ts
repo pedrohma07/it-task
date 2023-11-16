@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TaskService {
@@ -14,7 +14,15 @@ export class TaskService {
 
     const task = await this.prisma.task.create({ data });
 
-    return task;
+    const notification = await this.prisma.notification.create({
+      data: {
+        message: `Task ${task.title} created`,
+        dateTime: new Date(),
+        recipientId: userId,
+      },
+    });
+
+    return { ...notification, recipientId: undefined, id: undefined };
   }
 
   findAll() {
