@@ -14,7 +14,15 @@ export class TaskService {
 
     const task = await this.prisma.task.create({ data });
 
-    return task;
+    const notification = await this.prisma.notification.create({
+      data: {
+        message: `Task ${task.title} created`,
+        dateTime: new Date(),
+        recipientId: userId,
+      },
+    });
+
+    return { ...notification, recipientId: undefined, id: undefined };
   }
 
   findAll() {
@@ -40,7 +48,7 @@ export class TaskService {
   }
 
   async remove(id: number) {
-    const taskExists = this.prisma.task.findUnique({ where: { id } });
+    const taskExists = await this.prisma.task.findUnique({ where: { id } });
 
     if (!taskExists) {
       throw new HttpException('Task not found', HttpStatus.NOT_FOUND);
