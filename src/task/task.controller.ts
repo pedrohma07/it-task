@@ -1,15 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { AuthService } from '../../src/auth/auth.service';
 
 @Controller('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  async addTask(@Req() request: Request, @Body() createTaskDto: CreateTaskDto) {
+    const token = request.headers['authorization'].split(' ')[1];
+    const decodedToken = await this.authService.validateToken(token);
+
+    return this.taskService.create(createTaskDto, decodedToken.sub);
   }
 
   @Get()
@@ -22,13 +40,15 @@ export class TaskController {
     return this.taskService.findOne(+id);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+  editTask(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.update(+id, updateTaskDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  deleteTask(@Param('id') id: string) {
     return this.taskService.remove(+id);
   }
 }
